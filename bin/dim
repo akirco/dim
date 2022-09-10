@@ -6,7 +6,7 @@ const { version } = require("../package.json");
 const { error } = console;
 const { exit, argv } = process;
 const gradient = require("gradient-string");
-const { start, exc } = require("../main");
+const { start, exec } = require("../main");
 
 //自定义帮助信息
 program.version(version, "-v, --version", "output the current version");
@@ -14,7 +14,7 @@ program
   .command("clear")
   .description("Image quality enhancements and fixes")
   .action(function () {
-    start(exc);
+    start(exec);
   });
 
 //监听未定义的命令，打印帮助信息
