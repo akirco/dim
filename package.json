@@ -1,0 +1,25 @@
+{
+  "name": "dim",
+  "version": "0.1.0",
+  "description": "",
+  "bin": {
+    "dim": "./bin/dim"
+  },
+  "directories": {
+    "bin": "./bin",
+    "lib": "./"
+  },
+  "keywords": [
+    "cli",
+    "realesgan"
+  ],
+  "author": "akirco",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^9.4.0",
+    "gradient-string": "^2.0.2",
+    "inquirer": "8.2.4",
+    "inquirer-fuzzy-path": "^2.3.0",
+    "single-line-log": "^1.1.2"
+  }
+}

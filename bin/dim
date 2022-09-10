@@ -1,0 +1,44 @@
+#!/usr/bin/env node
+"use strict";
+
+const { program } = require("commander");
+const { version } = require("../package.json");
+const { error } = console;
+const { exit, argv } = process;
+const gradient = require("gradient-string");
+const { start, exc } = require("../main");
+
+//自定义帮助信息
+program.version(version, "-v, --version", "output the current version");
+program
+  .command("clear")
+  .description("Image quality enhancements and fixes")
+  .action(function () {
+    start(exc);
+  });
+
+//监听未定义的命令，打印帮助信息
+program.on("command:*", () => {
+  error(
+    gradient(
+      "yellow",
+      "cyan",
+      "pink"
+    )(
+      `Invalid command: ${program.args.join(
+        " "
+      )}\nSee --help for a list of available commands.`
+    )
+  );
+  exit(1);
+});
+
+//解析参数
+// console.log(argv);
+
+program.parse(argv);
+
+//如果没参数直接打印帮助信息
+if (!argv.slice(2).length) {
+  program.help({ error: true });
+}
