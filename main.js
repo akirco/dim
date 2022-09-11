@@ -8,7 +8,7 @@ const path = require("path");
 const { getPlatform } = require("./lib/getPlatform");
 const { basePrompt, pathPrompt } = require("./lib/prompts");
 const { getFileName, getFullDir, removeQuote } = require("./lib/pathFixes");
-const { isJpgPng } = require("./lib/fileUtils");
+const { isJpgPng, switchModels } = require("./lib/fileUtils");
 inquirer.registerPrompt("fuzzypath", require("inquirer-fuzzy-path"));
 
 const pb = new ProgressBar("处理进度", 0);
@@ -20,14 +20,10 @@ async function start(callback) {
     res.output = fuzzy.path;
   }
   const inputPath = removeQuote(res.input);
-  console.log(inputPath);
   if (isJpgPng(inputPath)) {
     const data = {
       input: inputPath,
-      model:
-        res.model === "4k-默认效果"
-          ? "realesrgan-x4plus"
-          : "realesrgan-x4plus-anime",
+      model: switchModels(res.model),
       format: res.format,
       isChangeOutpath: res.isChangeOutpath,
       output: res.isChangeOutpath ? res.output : inputPath,
