@@ -2,6 +2,18 @@
 # yarn lockfile v1
 
 
+"7zip-bin@5.1.1":
+  version "5.1.1"
+  resolved "https://mirrors.tencent.com/npm/7zip-bin/-/7zip-bin-5.1.1.tgz#9274ec7460652f9c632c59addf24efb1684ef876"
+  integrity sha512-sAP4LldeWNz0lNzmTird3uWfFDWWTeg6V/MsmyyLR9X1idwKBWIgt/ZvinqQldJm3LecKEs1emkbquO6PCiLVQ==
+
+"7zip-min@^1.4.3":
+  version "1.4.3"
+  resolved "https://mirrors.cloud.tencent.com/npm/7zip-min/-/7zip-min-1.4.3.tgz#84dbdd59215124bcf2aa6dc1bf102b40146eccb7"
+  integrity sha512-NsFTI3mxcRO3d3aZS+A9Fpmi+js+cpP2u/jaIbVpsH896SD5TbfYahhtFrLXTFz5Ae17ZE1SmzNGa/xeuNLYlQ==
+  dependencies:
+    "7zip-bin" "5.1.1"
+
 "@types/tinycolor2@^1.4.0":
   version "1.4.3"
   resolved "https://mirrors.cloud.tencent.com/npm/@types%2ftinycolor2/-/tinycolor2-1.4.3.tgz"

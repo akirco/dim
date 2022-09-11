@@ -13,6 +13,12 @@
     "cli",
     "realesgan"
   ],
+  "scripts": {
+    "pkg:linux": "pkg bin/dim -t  node16-linux-x64 --out-path ./dist/dim-linux",
+    "pkg:win": "pkg bin/dim -t  node16-win-x64 --out-path ./dist/dim-win",
+    "pkg:mac": "pkg bin/dim -t  node16-macos-x64 --out-path ./dist/dim-macos",
+    "dist": "node build.js"
+  },
   "author": "akirco",
   "license": "ISC",
   "dependencies": {
@@ -21,5 +27,8 @@
     "inquirer": "8.2.4",
     "inquirer-fuzzy-path": "^2.3.0",
     "single-line-log": "^1.1.2"
+  },
+  "devDependencies": {
+    "7zip-min": "^1.4.3"
   }
 }
