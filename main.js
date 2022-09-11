@@ -1,11 +1,11 @@
 "use strict";
 const { spawn } = require("node:child_process");
 const gradient = require("gradient-string");
+
 const ProgressBar = require("./lib/progress");
 const inquirer = require("inquirer");
 const slog = require("single-line-log").stdout;
-const path = require("path");
-const { getPlatform } = require("./lib/getPlatform");
+const { execPath, modelsPath } = require("./lib/binPath");
 const { basePrompt, pathPrompt } = require("./lib/prompts");
 const { getFileName, getFullDir, removeQuote } = require("./lib/pathFixes");
 const { isJpgPng, switchModels } = require("./lib/fileUtils");
@@ -38,22 +38,10 @@ async function start(callback) {
 }
 
 async function exec({ input, isChangeOutpath, output, model, format }) {
-  // const rootDir = path.join(process.execPath);
-  let rootDir;
-  if (process.argv[3] === "dev") {
-    rootDir = path.join(__filename);
-  } else {
-    rootDir = path.join(process.execPath);
-  }
-  const binPath = path.join(rootDir, "..", "resources");
-  const execPath = path.join(binPath, getPlatform(), "ncnn");
-  const modelsPath = path.join(binPath, "..", "resources", "models");
-  //* input 带文件的全路径
-  //* output 若修改只是dir
   let outputPath;
   if (isChangeOutpath) {
     //? 修改路径：dir+filename
-    outputPath = path.join(output, getFileName(input));
+    outputPath = output + getFileName(input);
   } else {
     //? 不修改路径：input === output,排除文件后缀+"-clear."+"png/jpg"
     outputPath = getFullDir(output) + "-clear." + format;
@@ -66,6 +54,7 @@ async function exec({ input, isChangeOutpath, output, model, format }) {
       detached: false,
     }
   );
+
   ncn.stderr.on("data", (data) => {
     data = data.toString();
     if (data.includes("invalid gpu")) {
