@@ -4,6 +4,8 @@
 
 ## install
 
+- windows
+
 ```powershell
 scoop bucket add aki 'https://github.com/akirco/aki-apps.git'
 scoop install dim
