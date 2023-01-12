@@ -1,19 +1,33 @@
 "use strict";
 const { spawn } = require("node:child_process");
 const gradient = require("gradient-string");
-
 const ProgressBar = require("./lib/progress");
 const inquirer = require("inquirer");
 const slog = require("single-line-log").stdout;
 const { execPath, modelsPath } = require("./lib/binPath");
-const { basePrompt, pathPrompt } = require("./lib/prompts");
+const { execPrompt, basePrompt, pathPrompt } = require("./lib/prompts");
 const { getFileName, getFullDir, removeQuote } = require("./lib/pathFixes");
-const { isJpgPng, switchModels } = require("./lib/fileUtils");
+const { isJpgPng } = require("./lib/fileUtils");
+const { join } = require("node:path");
 inquirer.registerPrompt("fuzzypath", require("inquirer-fuzzy-path"));
 
 const pb = new ProgressBar("处理进度", 0);
 
 async function start(callback) {
+  const execRes = await inquirer.prompt(execPrompt);
+  let models = [];
+  if (execRes.exec === "realesrgan-ncnn-vulkan") {
+    models = [
+      "realesrgan-x4plus-anime",
+      "realesrgan-x4plus",
+      "remacri",
+      "ultramix_balanced",
+      "ultrasharp",
+    ];
+  } else {
+    models = ["models-DF2K", "models-DF2K_JPEG"];
+  }
+  basePrompt[0].choices = models;
   const res = await inquirer.prompt(basePrompt);
   if (res.isChangeOutpath) {
     const fuzzy = await inquirer.prompt(pathPrompt);
@@ -22,14 +36,15 @@ async function start(callback) {
   const inputPath = removeQuote(res.input);
   if (isJpgPng(inputPath)) {
     const data = {
+      exec: execRes.exec,
       input: inputPath,
-      model: switchModels(res.model),
+      model: res.model,
       format: res.format,
       isChangeOutpath: res.isChangeOutpath,
       output: res.isChangeOutpath ? res.output : inputPath,
     };
     console.log(
-      gradient("cyan", "pink")("🔔PS:处理速度取决于GPU以及图片大小!!!")
+      gradient("cyan", "pink")("PS:处理速度取决于GPU以及图片大小!!!")
     );
     await callback(data);
   } else {
@@ -37,8 +52,9 @@ async function start(callback) {
   }
 }
 
-async function exec({ input, isChangeOutpath, output, model, format }) {
-  let outputPath;
+async function exec({ exec, input, isChangeOutpath, output, model, format }) {
+  console.log({ exec, input, isChangeOutpath, output, model, format });
+  let outputPath, ncn;
   if (isChangeOutpath) {
     //? 修改路径：dir+filename
     outputPath = output + getFileName(input);
@@ -46,14 +62,39 @@ async function exec({ input, isChangeOutpath, output, model, format }) {
     //? 不修改路径：input === output,排除文件后缀+"-clear."+"png/jpg"
     outputPath = getFullDir(output) + "-clear." + format;
   }
-  const ncn = spawn(
-    execPath,
-    ["-i", input, "-o", outputPath, "-s", 4, "-m", modelsPath, "-n", model],
-    {
-      cwd: null,
-      detached: false,
-    }
-  );
+  const upscaleExec = join(execPath, exec);
+  if (exec === "realesrgan-ncnn-vulkan") {
+    console.log("fullDir:", outputPath);
+    ncn = spawn(
+      upscaleExec,
+      ["-i", input, "-o", outputPath, "-s", 4, "-m", modelsPath, "-n", model],
+      {
+        cwd: null,
+        detached: false,
+      }
+    );
+  } else {
+    console.log("fullDir:", outputPath);
+    ncn = spawn(
+      upscaleExec,
+      [
+        "-i",
+        input,
+        "-o",
+        outputPath,
+        "-s",
+        4,
+        "-x",
+        "-m",
+        modelsPath + "\\" + model,
+      ],
+      {
+        cwd: undefined,
+        detached: false,
+      }
+    );
+  }
+  console.log(ncn);
 
   ncn.stderr.on("data", (data) => {
     data = data.toString();
