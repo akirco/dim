@@ -12,7 +12,7 @@ const { start, exec } = require("../main");
 program.version(version, "-v, --version", "output the current version");
 program
   .command("clear")
-  .description("Image quality enhancements and fixes with a signal file")
+  .description("Image quality enhancements and fixes with a single file")
   .action(function () {
     start(exec);
   });
