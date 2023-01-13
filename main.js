@@ -20,6 +20,8 @@ async function start(callback) {
     models = [
       "realesrgan-x4plus-anime",
       "realesrgan-x4plus",
+      "4x-AnimeSharp-opt-fp16",
+      "4x-AnimeSharp-opt-fp32",
       "remacri",
       "ultramix_balanced",
       "ultrasharp",
@@ -44,7 +46,7 @@ async function start(callback) {
       output: res.isChangeOutpath ? res.output : inputPath,
     };
     console.log(
-      gradient("cyan", "pink")("PS:处理速度取决于GPU以及图片大小!!!")
+      gradient("cyan", "pink", "purple")("PS:处理速度取决于GPU以及图片大小!!!")
     );
     await callback(data);
   } else {
@@ -53,7 +55,6 @@ async function start(callback) {
 }
 
 async function exec({ exec, input, isChangeOutpath, output, model, format }) {
-  console.log({ exec, input, isChangeOutpath, output, model, format });
   let outputPath, ncn;
   if (isChangeOutpath) {
     //? 修改路径：dir+filename
@@ -64,7 +65,6 @@ async function exec({ exec, input, isChangeOutpath, output, model, format }) {
   }
   const upscaleExec = join(execPath, exec);
   if (exec === "realesrgan-ncnn-vulkan") {
-    console.log("fullDir:", outputPath);
     ncn = spawn(
       upscaleExec,
       ["-i", input, "-o", outputPath, "-s", 4, "-m", modelsPath, "-n", model],
@@ -74,7 +74,6 @@ async function exec({ exec, input, isChangeOutpath, output, model, format }) {
       }
     );
   } else {
-    console.log("fullDir:", outputPath);
     ncn = spawn(
       upscaleExec,
       [
@@ -94,8 +93,6 @@ async function exec({ exec, input, isChangeOutpath, output, model, format }) {
       }
     );
   }
-  console.log(ncn);
-
   ncn.stderr.on("data", (data) => {
     data = data.toString();
     if (data.includes("invalid gpu")) {
@@ -103,9 +100,8 @@ async function exec({ exec, input, isChangeOutpath, output, model, format }) {
     } else if (data.includes("failed")) {
       slog(
         gradient(
-          "cyan",
-          "pink",
-          "red"
+          "red",
+          "yellow"
         )("图片已损坏！请重试！或「去除文件名中的特殊符号」后重试！")
       );
     } else if (data.length > 0 && data.length < 10) {
